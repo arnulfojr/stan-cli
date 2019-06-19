@@ -3,6 +3,8 @@
 
 Finally! A proper NATS CLI Tool that does not *completly* suck!
 
+Uses Click to expose a good and standarized CLI interface and uses Pygments to colorize JSON content!
+
 ## Requirements
 
 * Python >= 3.7
@@ -31,6 +33,8 @@ Piping is as easy as:
 
 ```bash
 $ cat data.json | docker-compose run cli request --raw subject-name - | jq -s .
+# if you expect JSON then simply ignore the raw
+$ cat data.json | docker-compose run cli request subject-name -
 # or
 $ cat data.json | docker run --interactive --rm --env-file $PWD/local.env nats-cli:latest request subject - | jq .
 ```

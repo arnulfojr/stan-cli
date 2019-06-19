@@ -30,7 +30,11 @@ def request(subject: str, data, timeout: int, raw: bool, **kwargs):
     """Send NATS request command."""
     helpers.is_verbose.set(kwargs.pop('verbose'))
 
-    data = json.dumps(json.load(data))
+    try:
+        data = json.dumps(json.load(data))
+    except json.JSONDecodeError:
+        click.echo('Only JSON files are supported', err=True)
+        return 1
 
     response = asyncio.run(nats.send_request(subject, data, timeout,
                                              options=kwargs))
@@ -84,8 +88,14 @@ def subscribe(subject: str, cluster: str, pretty_json: bool, **kwargs):
 @click.option('--port', envvar='NATS_PORT', type=int, default=4222)
 @click.option('--verbose', type=bool, default=False, is_flag=True)
 def publish(subject: str, cluster: str, data, **kwargs):
+    """Publish the data to the subject in STAN."""
     helpers.is_verbose.set(kwargs.pop('verbose'))
-    data = json.dumps(json.load(data))
+
+    try:
+        data = json.dumps(json.load(data))
+    except json.JSONDecodeError:
+        click.echo('Only JSON files are supported', err=True)
+        return 1
 
     status = asyncio.run(nats.send_event(subject, cluster, data,
                                          options=kwargs))

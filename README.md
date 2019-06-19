@@ -20,15 +20,20 @@ This can be adjusted to your needs.
 
 ```bash
 # requesting something through nats
-$ cat data.json | docker-compose run cli request subject-name --data -
+$ cat data.json | docker-compose run cli request subject-name -
 # or simply (but keep in mind the volumes mounting!)
-$ docker-compose run cli request subject-name --data data.json
+$ docker-compose run cli request subject-name data.json
+```
 
+Piping is as easy as:
+
+```bash
+$ cat data.json | docker-compose run cli request --raw subject-name - | jq -s .
 ```
 
 ```bash
 # publishing an event through stan
-$ cat data.json | docker-compose run cli publish subject-name cluster-name --data -
+$ cat data.json | docker-compose run cli publish --cluster myCluster subject-name -
 ```
 
 # Contact

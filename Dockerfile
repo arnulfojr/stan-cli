@@ -10,7 +10,7 @@ RUN apk add --no-cache build-base && \
     apk del build-base
 
 COPY ./entrypoint.py .
-COPY ./stancli/ .
+COPY ./stancli/ ./stancli/
 
 ENTRYPOINT ["/usr/local/bin/python", "/app/entrypoint.py"]
 

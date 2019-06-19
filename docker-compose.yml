@@ -1,0 +1,16 @@
+version: '3'
+services:
+  cli:
+    image: nats-cli
+    build:
+      context: .
+    env_file:
+      - local.env
+    networks:
+      - trv-studio
+    volumes:
+      - ./:/app/
+networks:
+  trv-studio:
+    external:
+      name: trv-studio

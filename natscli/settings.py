@@ -16,3 +16,5 @@ NATS_ENDPOINT = URL.build(
     host=NATS_HOST,
     port=NATS_PORT,
 )
+
+NATS_CLUSTER = os.getenv('NATS_CLUSTER')

@@ -7,10 +7,9 @@ services:
     env_file:
       - local.env
     networks:
-      - trv-studio
+      - nats-network
     volumes:
       - ./:/app/
+
 networks:
-  trv-studio:
-    external:
-      name: trv-studio
+  nats-network:

@@ -10,9 +10,10 @@ setup(
         'stancli',
     ],
     install_requires=[
+        'Click==7.0',
+        'Pygments==2.4.2',
         'asyncio-nats-client==0.9.2',
         'asyncio-nats-streaming==0.4.0',
-        'Click==7.0',
         'colorama==0.4.1',
         'ed25519==1.5',
         'idna==2.8',

@@ -1,7 +1,7 @@
 version: '3'
 services:
   cli:
-    image: nats-cli
+    image: stan-cli
     build:
       context: .
     env_file:

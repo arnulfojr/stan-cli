@@ -23,17 +23,30 @@ This can be adjusted to your needs.
 $ cat data.json | docker-compose run cli request subject-name -
 # or simply (but keep in mind the volumes mounting!)
 $ docker-compose run cli request subject-name data.json
+# if you prefer docker cli
+$ cat data.json | docker run --interactive --rm --env-file $PWD/local.env nats-cli:latest request subject -
 ```
 
 Piping is as easy as:
 
 ```bash
 $ cat data.json | docker-compose run cli request --raw subject-name - | jq -s .
+# or
+$ cat data.json | docker run --interactive --rm --env-file $PWD/local.env nats-cli:latest request subject - | jq .
 ```
 
 ```bash
 # publishing an event through stan
 $ cat data.json | docker-compose run cli publish --cluster myCluster subject-name -
+```
+
+
+To get the content of a channel the stancli supports
+
+```bash
+$ docker run --rm --env-file $PWD/local.env nats-cli:latest subscribe subject
+# if you expect JSON content, the lucky you (for ANSI add the --tty flag to docker run)
+$ docker run --rm -t --env-file $PWD/local.env nats-cli:latest subscribe subject --pretty-json
 ```
 
 # Contact

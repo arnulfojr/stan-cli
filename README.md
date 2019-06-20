@@ -5,6 +5,8 @@ Finally! A proper NATS CLI Tool that does not *completly* suck!
 
 Uses Click to expose a good and standarized CLI interface and uses Pygments to colorize JSON content!
 
+> This repository is still in alpha version
+
 ## Requirements
 
 * Python >= 3.7

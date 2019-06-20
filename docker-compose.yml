@@ -1,7 +1,7 @@
 version: '3'
 services:
   cli:
-    image: stan-cli
+    image: arnulfosolis/stan-cli:latest
     build:
       context: .
     env_file:

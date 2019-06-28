@@ -1,5 +1,6 @@
 import asyncio
 
+from typing import Union
 from uuid import uuid4
 
 import click
@@ -23,55 +24,44 @@ async def send_request(subject: str, data: str, timeout: int,
     return message.data.decode()
 
 
-async def send_event(subject: str, cluster: str, data: str,
-                     options: dict) -> bool:
+async def send_event(subject: str, data: str,
+                     cluster: Union[str, None] = None,
+                     options: dict = dict()) -> bool:
     """Sends the event through STAN."""
     nc = await nats_client(**options)
     if not nc:
         return False
 
-    sc = STAN()
+    sc = None
+    if cluster:
+        sc = await stan_client(nc, cluster)
 
-    async def ack_handler(ack):
-        if is_verbose.get():
-            click.secho(f'Published event to {subject} got ACKed', err=True)
+        if not sc:
+            return False
 
-    client_id = f'natscli-{uuid4()}'
-    try:
-        await sc.connect(cluster, client_id, nats=nc)
-    except Exception:
-        if is_verbose.get():
-            click.secho(f'Failed to connect to STAN', err=True)
-        return False
+        async def ack_handler(ack):
+            if is_verbose.get():
+                click.secho(f'Published event to {subject} got ACKed',
+                            err=True)
 
-    await sc.publish(subject, data.encode(), ack_handler=ack_handler)
+        await sc.publish(subject, data.encode(), ack_handler=ack_handler)
+    else:
+        await nc.publish(subject, data.encode())
 
     if is_verbose.get():
         click.secho(f'Sent event to {subject}')
 
-    await sc.close()
+    if sc:
+        await sc.close()
     await nc.close()
 
     return True
 
 
-async def subscribe(subject: str, cluster: str,
-                    pretty_json: bool, options: dict):
+async def subscribe(subject: str,
+                    pretty_json: bool, options: dict = dict(),
+                    cluster: Union[str, None] = None):
     append = options.pop('append')
-
-    nc = await nats_client(**options)
-    if not nc:
-        return False
-
-    sc = STAN()
-
-    client_id = f'natscli-{uuid4()}'
-    try:
-        await sc.connect(cluster, client_id, nats=nc)
-    except Exception:
-        if is_verbose.get():
-            click.secho(f'Failed to connect to STAN', err=True)
-        return False
 
     async def handler(msg):
         """Handle the incomming message."""
@@ -84,8 +74,20 @@ async def subscribe(subject: str, cluster: str,
         else:
             click.secho(message, bg='red', fg='white', err=True)
 
-    subscription = await sc.subscribe(subject,
-                                      cb=handler)
+    nc = await nats_client(**options)
+    if not nc:
+        return False
+
+    if cluster:
+        sc = await stan_client(nc, cluster)
+        if not sc:
+            return False
+
+        client = nc
+    else:
+        client = sc
+
+    subscription = await client.subscribe(subject, cb=handler)
 
     if is_verbose.get():
         click.secho(f'Subscribed to {subject}', bg='green', fg='white',
@@ -95,12 +97,17 @@ async def subscribe(subject: str, cluster: str,
         try:
             await asyncio.sleep(1)
         except (asyncio.CancelledError, KeyboardInterrupt):
-            await subscription.unsubscribe()
+            if cluster:
+                await subscription.unsubscribe()
+            else:
+                await nc.unsubscribe(subscription)
+
             if is_verbose.get():
                 click.secho(f'Unsubscribed from {subject}', err=True)
             break
 
-    await sc.close()
+    if cluster:
+        await sc.close()
     await nc.close()
 
 
@@ -108,6 +115,7 @@ async def nats_client(host: str, port: int,
                       user: str, password: str,
                       **kwargs) -> NATS:
     """Returns a NATS client already connected."""
+    # TODO: async context manager
     nc = NATS()
 
     async def error_cb(e):
@@ -143,3 +151,18 @@ async def nats_client(host: str, port: int,
         return None
 
     return nc
+
+
+async def stan_client(nats_client: NATS, cluster: str) -> STAN:
+    """Returns a connected STAN client."""
+    # TODO: async context manager
+    sc = STAN()
+
+    client_id = f'natscli-{uuid4()}'
+    try:
+        await sc.connect(cluster, client_id, nats=nats_client)
+    except Exception:
+        if is_verbose.get():
+            click.secho(f'Failed to connect to STAN', err=True)
+        return None
+    return sc

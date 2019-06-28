@@ -76,8 +76,9 @@ def subscribe(subject: str, cluster: str, pretty_json: bool, **kwargs):
 
     state = False
     try:
-        state = asyncio.run(nats.subscribe(subject, cluster,
+        state = asyncio.run(nats.subscribe(subject,
                                            pretty_json,
+                                           cluster=cluster,
                                            options=kwargs))
     except (asyncio.CancelledError, click.Abort, NatsError, StanError):
         state = True
@@ -110,7 +111,8 @@ def publish(subject: str, cluster: str, data, **kwargs):
         click.echo('Only JSON files are supported', err=True)
         return 1
 
-    status = asyncio.run(nats.send_event(subject, cluster, data,
+    status = asyncio.run(nats.send_event(subject, data,
+                                         cluster=cluster,
                                          options=kwargs))
 
     if status:

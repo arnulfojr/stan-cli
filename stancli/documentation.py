@@ -16,7 +16,7 @@ NATS_HOST = 'NATS hostname or IP, envvar: NATS_HOST'
 
 NATS_PORT = 'NATS port, envvar: NATS_PORT'
 
-STAN_CLUSTER = 'STAN cluster to use, envvar: STAN_CLUSTER'
+STAN_CLUSTER = 'STAN cluster to use. If is unset, the CLI will use NATS instead of STAN for the specified command, envvar: STAN_CLUSTER'  # noqa
 
 VERBOSE = 'Verbose logging'
 

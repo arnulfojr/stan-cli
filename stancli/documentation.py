@@ -2,7 +2,9 @@
 
 SUBJECT = 'NATS/STAN subject name'
 
-DATA = 'Data to send, this can be through stdin (use -) or a file itself'
+DATA = """
+Data to send, this can be through stdin (use -) or a file itself
+"""
 
 TIMEOUT = 'Amount of time to wait for a response, in seconds'
 
@@ -16,7 +18,9 @@ NATS_HOST = 'NATS hostname or IP, envvar: NATS_HOST'
 
 NATS_PORT = 'NATS port, envvar: NATS_PORT'
 
-STAN_CLUSTER = 'STAN cluster to use, envvar: STAN_CLUSTER'
+STAN_CLUSTER = """
+STAN cluster to use. If is unset, the CLI will use NATS instead of STAN for the specified command, envvar: STAN_CLUSTER
+"""
 
 VERBOSE = 'Verbose logging'
 

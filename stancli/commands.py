@@ -40,8 +40,8 @@ def request(subject: str, data, timeout: int, raw: bool, **kwargs):
         click.echo('Only JSON files are supported', err=True)
         return 1
 
-    response = asyncio.run(nats.send_request(subject, data, timeout,
-                                             options=kwargs))
+    response = asyncio.run(nats.request(subject, data, timeout,
+                                        options=kwargs))
     if not response:
         return 1
 
@@ -76,8 +76,9 @@ def subscribe(subject: str, cluster: str, pretty_json: bool, **kwargs):
 
     state = False
     try:
-        state = asyncio.run(nats.subscribe(subject, cluster,
+        state = asyncio.run(nats.subscribe(subject,
                                            pretty_json,
+                                           cluster=cluster,
                                            options=kwargs))
     except (asyncio.CancelledError, click.Abort, NatsError, StanError):
         state = True
@@ -110,8 +111,9 @@ def publish(subject: str, cluster: str, data, **kwargs):
         click.echo('Only JSON files are supported', err=True)
         return 1
 
-    status = asyncio.run(nats.send_event(subject, cluster, data,
-                                         options=kwargs))
+    status = asyncio.run(nats.publish(subject, data,
+                                      cluster=cluster,
+                                      options=kwargs))
 
     if status:
         return 0

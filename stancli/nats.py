@@ -12,8 +12,8 @@ from stan.aio.client import Client as STAN
 from .helpers import colorize_json, is_verbose
 
 
-async def send_request(subject: str, data: str, timeout: int,
-                       options: dict) -> str:
+async def request(subject: str, data: str, timeout: int,
+                  options: dict) -> str:
     """Sends a request and returns the response body."""
     async with nats_client(**options) as nc:
         message = await nc.request(subject, data.encode(),
@@ -21,9 +21,9 @@ async def send_request(subject: str, data: str, timeout: int,
         return message.data.decode()
 
 
-async def send_event(subject: str, data: str,
-                     cluster: Union[str, None] = None,
-                     options: dict = dict()) -> bool:
+async def publish(subject: str, data: str,
+                  cluster: Union[str, None] = None,
+                  options: dict = dict()) -> bool:
     """Sends the event through STAN."""
     async with nats_client(**options) as nc:
         if not cluster:

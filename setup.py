@@ -19,7 +19,7 @@ setup(
         'idna==2.8',
         'multidict==4.5.2',
         'nkeys==0.1.0',
-        'protobuf==3.8.0',
+        'protobuf==3.15.0',
         'six==1.12.0',
         'yarl==1.3.0',
     ],
